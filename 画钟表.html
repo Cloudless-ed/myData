@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Watch</title>
+    <link type="text/css" rel="stylesheet" href="css/index.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        window.onload=function(){
+            var canvas=document.getElementsByTagName('canvas')[0];//获取第一个canvas节点
+            var xhr=canvas.getContext('2d');//设定2D环境对象
+            var oR=150;//声明圆的半径
+            var oX=300;//声明圆心的坐标
+            var oY=300;
+            var oL=8;//声明表盘刻度的长度
+            drawWatch();
+            function drawWatch(){
+                //初始化设定样式
+                var color=xhr.createRadialGradient(300,300,0,300,300,150);//表盘径向渐变色
+                color.addColorStop(0,'red');
+                color.addColorStop(1,'#333');
+                xhr.fillStyle=color;//填充色
+                //画表盘
+                xhr.beginPath();
+
+                xhr.arc(oX,oY,oR,0,2*Math.PI,false);
+                xhr.fill();//填充
+                // xhr.stroke();--绘制圆的路径
+                xhr.closePath();
+                //画刻度
+                var deg=0;
+                for(var i=0;i<60;i++){
+                    deg=i*6;
+                    if(i%5==0){//i除以5取余数为0的话执行下列条件
+                        oL=12;
+                        xhr.strokeStyle="#f00";
+                        xhr.lineWidth=4;
+                    }
+                    else{oL=8;
+                         xhr.strokeStyle="#fff";
+                         xhr.lineWidth=2;
+
+                         
+                    }
+                    xhr.beginPath();
+                xhr.moveTo(300+oR*Math.cos(deg/180*Math.PI),300+oR*Math.sin(deg/180*Math.PI));
+                xhr.lineTo(300+(oR-oL)*Math.cos(deg/180*Math.PI),300+(oR-oL)*Math.sin(deg/180*Math.PI));
+                xhr.stroke();
+                xhr.closePath();
+
+                
+                }
+            
+            }
+            drawWatch();//初始化时画表盘
+            //画表针
+            // drawScale();
+            function drawScale(mL,mdeg,mColor,mlineWidth){//画刻度
+                xhr.beginPath();
+                xhr.strokeStyle=mColor;
+                xhr.lineWidth=mlineWidth;
+                xhr.moveTo(300,300);
+                xhr.lineTo(300+mL*Math.cos(mdeg/180*Math.PI),300+mL*Math.sin(mdeg/180*Math.PI));
+                xhr.stroke();
+                xhr.closePath();
+            }
+
+            var date=new Date();
+            var sdeg=date.getSeconds()*6 -90;
+            var mdeg=date.getMinutes()*6 -90;
+            var hdeg=date.getHours()*30 -90+(date.getMinutes()*6/12);
+
+            drawScale(80,hdeg,'#fb737a',6);//画时针
+            drawScale(100,mdeg,'#fff',4);//画分针
+            drawScale(120,sdeg,'#000',2);//画秒针
+            //表针动画
+            setInterval(function(){
+                xhr.clearRect(0,0,600,600);//清除画布
+                drawWatch();//清除画布后，再次画表盘，如果没有这行代码，刷新页面之后表盘会消失不见，只剩下几个表针显示。
+                var date=new Date();
+                var sdeg=date.getSeconds()*6 -90;
+                var mdeg=date.getMinutes()*6 -90;
+                var hdeg=date.getHours()*30 -90+(date.getMinutes()*6/30);
+                drawScale(80,hdeg,'#fb737a',6);//画时针
+                drawScale(100,mdeg,'#fff',4);//画分针
+                drawScale(120,sdeg,'#000',2);//画秒针
+                drawHeart();
+            },1000)
+            function drawHeart(){//画表芯
+                xhr.beginPath();
+                xhr.fillStyle="#fff";
+                xhr.arc(oX,oY,10,0,2*Math.PI,false);
+                xhr.fill();
+                xhr.closePath();
+                xhr.beginPath();
+                xhr.fillStyle="#000";
+                xhr.arc(oX,oY,5,0,2*Math.PI,false);
+                xhr.fill();
+                xhr.closePath();
+            }
+            drawHeart();
+        }
+    </script>
+    <style type="text/css">
+    .box{
+        width:600px;
+        height:600px;
+        border:1px solid palegreen;
+        margin:100px auto;
+    }
+    canvas{
+        background:#eee;
+    }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <canvas width="600" height="600"></canvas>
+    </div>
+</body>
+</html>
